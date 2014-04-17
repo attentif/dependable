@@ -27,7 +27,7 @@ container.register('transport', {
 
 ### Register a dependency that has other dependencies
 
-When the argument is a function, the function's arguments are automatically
+When the argument is a function, by default the function's arguments are automatically
 populated with the correct dependencies, and the return value of the function
 is registered as the dependency:
 
@@ -45,6 +45,30 @@ container.register('song', function (occupation, transport, legalStatus) {
 
   return song;
 });
+```
+
+#### Registering functions as dependencies
+
+Now if you need to register actual *function* dependencies, you can use Dependable with function annotations. If your container is created with the option `useFnAnnotations`, registering a function dependency will check whether the function has property `injectDependencies`, and if not handle it as a simple dependency (without performing injection):
+
+```js
+var container = dependable.container({useFnAnnotations: true});
+
+// simple function dependency
+container.register('statsFn', function (someText) {
+  /* count words, check for rhymes, etc. */
+};
+
+// dependency with other dependencies
+var song = function (occupation, transport, legalStatus, statsFn) {
+  // ...
+  song.stats = function stats() {
+    return statsFn(this.chorus());
+  };
+  // ...
+});
+song.injectDependencies = true; // <-- annotate for injection
+container.register('song', song);
 ```
 
 ### Register a dependency out-of-order
@@ -143,9 +167,9 @@ Tests are written with mocha. To run the tests, run `npm test`.
 
 Copyright (c) 2013 i.TV LLC
 
-Permission is hereby granted, free of charge, to any person obtaining a copy  of this software and associated documentation files (the "Software"), to deal  in the Software without restriction, including without limitation the rights  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell  copies of the Software, and to permit persons to whom the Software is  furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is  furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN  THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN  THE SOFTWARE.
 

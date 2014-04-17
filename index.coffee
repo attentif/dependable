@@ -4,10 +4,11 @@ fs = require 'fs'
 existsSync = fs.existsSync ? path.existsSync
 
 # simple dependency injection. No nesting, just pure simplicity
-exports.container = ->
+exports.container = (opts) ->
 
   factories = {}
   modules = {}
+  options = opts or {}
 
 
   ## REGISTER / PARSE ################################################
@@ -49,7 +50,7 @@ exports.container = ->
       if stats.isFile() then loadfile file
 
   toFactory = (func) ->
-    if typeof func is "function"
+    if typeof func is "function" and (not options.useFnAnnotations or func.injectDependencies)
       func: func
       required: argList func
     else

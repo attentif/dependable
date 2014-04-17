@@ -8,10 +8,11 @@
 
   existsSync = (_ref = fs.existsSync) != null ? _ref : path.existsSync;
 
-  exports.container = function() {
-    var argList, container, factories, get, haveVisited, load, loaddir, loadfile, modules, notEmpty, register, registerOne, resolve, toFactory;
+  exports.container = function(opts) {
+    var argList, container, factories, get, haveVisited, load, loaddir, loadfile, modules, notEmpty, options, register, registerOne, resolve, toFactory;
     factories = {};
     modules = {};
+    options = opts || {};
     register = function(name, func) {
       var hash, _results;
       if (name === Object(name)) {
@@ -73,7 +74,7 @@
       return _results;
     };
     toFactory = function(func) {
-      if (typeof func === "function") {
+      if (typeof func === "function" && (!options.useFnAnnotations || func.injectDependencies)) {
         return {
           func: func,
           required: argList(func)

@@ -171,6 +171,7 @@ describe 'inject', ->
     deps = container()
     assert.equal deps.get('_container'), deps
 
+
   describe 'cache', ->
     it 'should re-use the same instance', ->
       deps = container()
@@ -180,6 +181,7 @@ describe 'inject', ->
       assert.notEqual a, {one: "one"}
       a2 = deps.get "a"
       assert.equal a, a2
+
 
   describe 'overrides', ->
     it 'should override a dependency', ->
@@ -299,11 +301,13 @@ describe 'inject', ->
             assert.equal 'd', deps.get 'D'
             done()
 
+
   describe 'simple dependencies', ->
     it 'doesnt have to be a function. objects work too', ->
       deps = container()
       deps.register "a", "a"
       assert.equal deps.get("a"), "a"
+
 
   describe 'registering a hash', ->
     it 'should register a hash of key : dep pairs', ->
@@ -315,8 +319,24 @@ describe 'inject', ->
       assert.equal deps.get("a"), "a"
       assert.equal deps.get("b"), "b"
 
+
+  describe '"use function annotations" mode', ->
+    it 'should support simple function dependencies by annotating functions requiring injection', ->
+      simpleFn = (arg) -> "got #{arg}"
+      initComponentFn = (fnDependency) -> { doSomething: (arg) -> fnDependency(arg) }
+      initComponentFn.injectDependencies = true
+
+      deps = container(useFnAnnotations: true)
+      deps.register "fnDependency", simpleFn
+      deps.register "component", initComponentFn
+
+      component = deps.get "component"
+      assert.equal component.doSomething('gruyère & walnuts'), 'got gruyère & walnuts'
+
+
   describe 'nested containers', ->
     it 'should inherit deps from the parent'
+
 
   describe 'maybe', ->
     it 'should support objects/data instead of functions?'
