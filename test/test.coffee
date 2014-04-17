@@ -23,7 +23,7 @@ describe 'inject', ->
     deps.register "names", Names
     assert.equal deps.get("stuff"), "one"
 
-  it 'should resovle multiple dependencies', ->
+  it 'should resolve multiple dependencies', ->
     post = (Comments, Users) ->
       class Post
         constructor: (@comments, @author) ->
